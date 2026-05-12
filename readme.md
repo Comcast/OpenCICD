@@ -12,12 +12,20 @@ opencicd is a utility that enables the following:
 
 To Install:
 
-- Prerequisites: opencicd was developed using Python 3.11, so check that your local python is >= 3.11
+- Prerequisites: opencicd was developed using Python 3.12, so check that your local python is >= 3.12
 - Type in your cli:
   
   ```
-  pip install --upgrade opencicd --extra-index-url https://pypi.org/simple
+  pip install "git+ssh://git@github.com/Comcast/OpenCICD.git@pip-latest#egg=opencicd"
   ```
+
+## Installation from source
+
+To install from source, download the source and from that directory
+
+```
+pip install .
+```
 
 ## Running opencicd
 
