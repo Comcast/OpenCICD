@@ -23,6 +23,7 @@ import re
 import string
 import subprocess
 from enum import Enum
+from typing import Optional
 
 from opencicd import constants
 from opencicd.model.action import Action, load_action
@@ -41,7 +42,8 @@ def run_action(
     inputs: dict[str, str],
     secrets: dict[str, str],
     use_posix: bool,
-    quiet: bool
+    quiet: bool,
+    docker_user: Optional[str] = None
 ):
     project_action = action.project_action
     if not quiet:
@@ -54,7 +56,7 @@ def run_action(
     action.validate()
     job_number=1
     for job in action.jobs:
-        job_runner(project, project_action, action, job, run_method, inputs, secrets, use_posix, quiet, job_number)
+        job_runner(project, project_action, action, job, run_method, inputs, secrets, use_posix, quiet, job_number, docker_user)
         job_number=job_number+1
 
 def display_text(
@@ -83,7 +85,8 @@ def job_runner(
     secrets: dict[str, str],
     use_posix: bool,
     quiet: bool,
-    job_number: int
+    job_number: int,
+    docker_user: Optional[str] = None
 ):
     display_text(
         run_method,
@@ -110,6 +113,10 @@ def job_runner(
         text("--volume"),
         text(f"{project.host_project_folder}:{project.container_project_folder}")
     ]
+
+    if docker_user:
+        command_array.append(text("--user"))
+        command_array.append(text(docker_user))
 
     if job.volumes:
         for key, value in job.volumes.items():

@@ -102,6 +102,19 @@ example output:
 ```
 In this scenario, ```set -e``` is not included
 
+## Docker runtime user
+If a job writes into the mounted project directory and you need the resulting files to be owned by a specific host user or group, specify ```--docker-user``` with any value accepted by ```docker run --user```, such as ```1000```, ```1000:1000``` or ```node```.
+
+``` 
+opencicd --method=print --no-posix --quiet --docker-user 1000:1000 publish test2
+```
+example output:
+```
+"docker" "run" "--rm" "--workdir" "/work" "--volume" ".:/work" "--user" "1000:1000" "-e" "CONTAINER_PROJECT_FOLDER=/work" "-e" "HOST_PROJECT_FOLDER=." "-e" "ACTION_TYPE=publish" "-e" "ACTION=test2" "alpine:3.21" "echo" "TEST2!!!" "" "/work" "publish" "test2"
+```
+
+If ```--docker-user``` is omitted, generated docker run commands keep using the image default user. This option only affects runtime ```docker run``` commands and does not change ```docker build```, ```docker image load```, ```docker save``` or ```docker push``` commands.
+
 ## Specifying inputs and Secrets
 
     arg_parser.add_argument("--input-env", required=False, help="Environment variable which is an input, can supply many, ex: --input-env VAR_NAME", action='append')
@@ -130,6 +143,11 @@ In this scenario, ```set -e``` is not included
   opencicd --project-folder /myproject --container-project-folder /myproject publish
   ```
   This is used as the volume mount point and workdir inside the container
+- Docker runtime user: This is the optional user passed to runtime containers with ```docker run --user```. Use it when mounted files should be written as a specific host uid:gid or named user.
+  ```
+  opencicd --docker-user 1000:1000 publish
+  ```
+  If not specified, the image default user is used.
 
 ## cicd
 When running opencicd from a cicd platform, the ```--cicd``` option does the following:
