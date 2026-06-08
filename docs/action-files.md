@@ -195,6 +195,13 @@ You can specify volumes to mount when RUNNING the image just like typically done
 ```
 NOTE: Replacements are made in both the key and the value
 
+### Docker runtime user
+Action files do not declare the runtime user. If a job mounts the host project folder or another host directory and should write files as a specific host uid:gid or named user, provide the runtime user when invoking opencicd:
+```
+opencicd --docker-user 1000:1000 publish test2
+```
+The value is passed through to ```docker run --user``` for runtime container commands only. It does not affect ```docker build```, ```docker image load```, ```docker save``` or ```docker push``` steps declared by the action.
+
 # Step 3: Pushing an image
 After the image is loaded and possibly run, the image can be pushed like so:
 ```yaml
