@@ -116,14 +116,14 @@ example output:
 If ```--docker-user``` is omitted, generated docker run commands keep using the image default user. This option only affects runtime ```docker run``` commands and does not change ```docker build```, ```docker image load```, ```docker save``` or ```docker push``` commands.
 
 ## Temporary runtime home
-If a job needs a writable home directory for caches, config files, or temporary state, specify ```--tmp-home``` to mount a disposable tmpfs at ```/tmp/home``` and force ```HOME=/tmp/home``` for generated runtime containers.
+If a job needs a writable, executable home directory for caches, config files, or temporary state, specify ```--tmp-home``` to mount a disposable tmpfs at ```/tmp/home``` with ```rw,exec``` and force ```HOME=/tmp/home``` for generated runtime containers.
 
 ```
 opencicd --method=print --no-posix --quiet --tmp-home publish test2
 ```
 example output:
 ```
-"docker" "run" "--rm" "--workdir" "/work" "--volume" ".:/work" "--tmpfs" "/tmp/home:rw" "-e" "CONTAINER_PROJECT_FOLDER=/work" "-e" "HOST_PROJECT_FOLDER=." "-e" "ACTION_TYPE=publish" "-e" "ACTION=test2" "-e" "HOME=/tmp/home" "alpine:3.21" "echo" "TEST2!!!" "" "/work" "publish" "test2"
+"docker" "run" "--rm" "--workdir" "/work" "--volume" ".:/work" "--tmpfs" "/tmp/home:rw,exec" "-e" "CONTAINER_PROJECT_FOLDER=/work" "-e" "HOST_PROJECT_FOLDER=." "-e" "ACTION_TYPE=publish" "-e" "ACTION=test2" "-e" "HOME=/tmp/home" "alpine:3.21" "echo" "TEST2!!!" "" "/work" "publish" "test2"
 ```
 
 When ```--tmp-home``` is combined with a numeric docker runtime user, the generated tmpfs mount inherits the same numeric owner information so that the runtime user can write to ```/tmp/home```.
@@ -133,7 +133,7 @@ opencicd --method=print --no-posix --quiet --tmp-home --docker-user 1000:1000 pu
 ```
 example output:
 ```
-"docker" "run" "--rm" "--workdir" "/work" "--volume" ".:/work" "--user" "1000:1000" "--tmpfs" "/tmp/home:rw,uid=1000,gid=1000" "-e" "CONTAINER_PROJECT_FOLDER=/work" "-e" "HOST_PROJECT_FOLDER=." "-e" "ACTION_TYPE=publish" "-e" "ACTION=test2" "-e" "HOME=/tmp/home" "alpine:3.21" "echo" "TEST2!!!" "" "/work" "publish" "test2"
+"docker" "run" "--rm" "--workdir" "/work" "--volume" ".:/work" "--user" "1000:1000" "--tmpfs" "/tmp/home:rw,exec,uid=1000,gid=1000" "-e" "CONTAINER_PROJECT_FOLDER=/work" "-e" "HOST_PROJECT_FOLDER=." "-e" "ACTION_TYPE=publish" "-e" "ACTION=test2" "-e" "HOME=/tmp/home" "alpine:3.21" "echo" "TEST2!!!" "" "/work" "publish" "test2"
 ```
 
 If ```--tmp-home``` is omitted outside ```--cicd```, generated docker run commands keep using the image-defined ```HOME``` behavior. This option only affects runtime ```docker run``` commands and does not change ```docker build```, ```docker image load```, ```docker save``` or ```docker push``` commands.

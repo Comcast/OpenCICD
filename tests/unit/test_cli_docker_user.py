@@ -52,7 +52,7 @@ def test_print_commands_include_tmp_home_when_requested(capsys: pytest.CaptureFi
     run_lines = run_print_command(capsys, "--tmp-home")
 
     assert run_lines
-    assert all('"--tmpfs" "/tmp/home:rw"' in line for line in run_lines)
+    assert all('"--tmpfs" "/tmp/home:rw,exec"' in line for line in run_lines)
     assert all('"-e" "HOME=/tmp/home"' in line for line in run_lines)
 
 
@@ -85,7 +85,7 @@ def test_cicd_print_commands_enable_tmp_home_by_default(capsys: pytest.CaptureFi
     run_lines = [line for line in capsys.readouterr().out.splitlines() if line.startswith('"docker" "run"')]
 
     assert run_lines
-    assert all('"--tmpfs" "/tmp/home:rw"' in line for line in run_lines)
+    assert all('"--tmpfs" "/tmp/home:rw,exec"' in line for line in run_lines)
     assert all('"-e" "HOME=/tmp/home"' in line for line in run_lines)
 
 
@@ -119,11 +119,11 @@ def test_print_commands_include_tmp_home_uid_owner_from_docker_user(capsys: pyte
     run_lines = run_print_command(capsys, "--tmp-home", "--docker-user", "1000")
 
     assert run_lines
-    assert all('"--tmpfs" "/tmp/home:rw,uid=1000"' in line for line in run_lines)
+    assert all('"--tmpfs" "/tmp/home:rw,exec,uid=1000"' in line for line in run_lines)
 
 
 def test_print_commands_include_tmp_home_uid_gid_owner_from_docker_user(capsys: pytest.CaptureFixture[str]):
     run_lines = run_print_command(capsys, "--tmp-home", "--docker-user", "1000:1001")
 
     assert run_lines
-    assert all('"--tmpfs" "/tmp/home:rw,uid=1000,gid=1001"' in line for line in run_lines)
+    assert all('"--tmpfs" "/tmp/home:rw,exec,uid=1000,gid=1001"' in line for line in run_lines)

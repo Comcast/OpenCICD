@@ -1,4 +1,10 @@
-## ADDED Requirements
+# docker-runtime-user Specification
+
+## Purpose
+
+Defines how OpenCICD selects the user for runtime Docker jobs and forwards the runner's numeric user identity in CI.
+
+## Requirements
 
 ### Requirement: CLI supports docker runtime user option
 The `opencicd` CLI SHALL accept an optional `--docker-user` argument and SHALL treat its value as the docker runtime user for the current invocation.
