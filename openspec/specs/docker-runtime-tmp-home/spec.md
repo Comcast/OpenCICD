@@ -1,4 +1,10 @@
-## ADDED Requirements
+# docker-runtime-tmp-home Specification
+
+## Purpose
+
+Defines how OpenCICD provides a disposable home directory for runtime Docker jobs, including its CLI defaults, environment, and numeric user ownership.
+
+## Requirements
 
 ### Requirement: CLI supports temporary runtime home option
 The `opencicd` CLI SHALL accept an optional `--tmp-home` argument that enables a disposable runtime home directory for generated `docker run` commands in the current invocation.
@@ -12,12 +18,16 @@ The `opencicd` CLI SHALL accept an optional `--tmp-home` argument that enables a
 - **THEN** the invocation SHALL proceed without configuring a temporary runtime home override
 
 ### Requirement: Runtime docker commands configure a temporary home mount
-OpenCICD SHALL add a tmpfs mount at `/tmp/home` and SHALL set `HOME=/tmp/home` for each generated runtime `docker run` command when tmp-home mode is enabled.
+OpenCICD SHALL add an executable tmpfs mount at `/tmp/home` and SHALL set `HOME=/tmp/home` for each generated runtime `docker run` command when tmp-home mode is enabled.
 
 #### Scenario: Printed commands include tmpfs and home override
 - **WHEN** a caller runs `opencicd --method print --tmp-home`
-- **THEN** each printed runtime `docker run` command SHALL include `--tmpfs` followed by `/tmp/home:rw`
+- **THEN** each printed runtime `docker run` command SHALL include `--tmpfs` followed by `/tmp/home:rw,exec`
 - **THEN** each printed runtime `docker run` command SHALL include `-e` followed by `HOME=/tmp/home`
+
+#### Scenario: Numeric docker user retains executable tmpfs
+- **WHEN** a caller runs `opencicd --method print --tmp-home --docker-user 1000:1001`
+- **THEN** each printed runtime `docker run` command SHALL include `--tmpfs` followed by `/tmp/home:rw,exec,uid=1000,gid=1001`
 
 #### Scenario: Tmp-home overrides other generated home values
 - **WHEN** tmp-home mode is enabled for a runtime `docker run` command
@@ -47,10 +57,10 @@ OpenCICD SHALL enable tmp-home mode by default for generated runtime `docker run
 - **THEN** generated runtime `docker run` commands SHALL omit the generated `HOME=/tmp/home` override
 
 ### Requirement: Documentation explains temporary runtime home behavior
-The user-facing documentation SHALL describe `--tmp-home`, the `/tmp/home` runtime path, the `--cicd` default, and the fact that the option affects generated runtime `docker run` commands only.
+The user-facing documentation SHALL describe `--tmp-home`, the executable `/tmp/home` runtime tmpfs, the `--cicd` default, and the fact that the option affects generated runtime `docker run` commands only.
 
 #### Scenario: Runtime documentation shows tmp-home behavior
 - **WHEN** a user reads the documented CLI runtime options
-- **THEN** the documentation SHALL include an example that uses `--tmp-home`
+- **THEN** the documentation SHALL include an example that uses `--tmp-home` and shows `--tmpfs /tmp/home:rw,exec`
 - **THEN** the documentation SHALL explain that `--cicd` enables tmp-home by default
 - **THEN** the documentation SHALL explain that the option does not affect non-runtime docker commands

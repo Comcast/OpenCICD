@@ -612,7 +612,7 @@ def build_replacement_values(
 
 
 def build_tmp_home_mount_option(docker_user: Optional[str]) -> str:
-    mount_option = f"{TMP_HOME_PATH}:rw"
+    mount_option = f"{TMP_HOME_PATH}:rw,exec"
     uid_gid = parse_numeric_docker_user(docker_user)
     if uid_gid is None:
         return mount_option
